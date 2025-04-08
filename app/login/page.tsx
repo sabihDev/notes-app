@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Link from "next/link";
 
 export default function Login() {
   return (
@@ -40,6 +41,12 @@ export default function Login() {
           <Button className="w-full" type="submit">
             Sign in
           </Button>
+          <p className="text-center text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/signup" className="text-primary hover:underline">
+              Sign up
+            </Link>
+          </p>
         </form>
       </div>
     </div>
