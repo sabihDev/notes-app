@@ -3,17 +3,31 @@ import { prisma } from "@/lib/prisma";
 import { hash, compare } from "bcryptjs";
 import { z } from "zod";
 
-const authSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  name: z.string().optional(),
-  type: z.enum(["login", "signup"]),
-});
+const authSchema = z
+  .object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    name: z.string().nullable().optional(),
+    type: z.enum(["login", "signup"]),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "signup") {
+        return !!data.name;
+      }
+      return true;
+    },
+    {
+      message: "Name is required for signup",
+      path: ["name"],
+    }
+  );
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const result = authSchema.safeParse(body);
+    console.log(result);
 
     if (!result.success) {
       return NextResponse.json(
@@ -52,13 +66,25 @@ export async function POST(request: Request) {
       }
 
       const { id, email: userEmail, name: userName } = user;
-      return NextResponse.json({
+
+      // Create response with cookie
+      const response = NextResponse.json({
         user: {
           id,
           email: userEmail,
           name: userName,
         },
       });
+
+      // Set cookie in response
+      response.cookies.set("userId", id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      });
+
+      return response;
     }
 
     if (type === "signup") {
@@ -95,7 +121,18 @@ export async function POST(request: Request) {
         },
       });
 
-      return NextResponse.json({ user });
+      // Create response with cookie
+      const response = NextResponse.json({ user });
+
+      // Set cookie in response
+      response.cookies.set("userId", user.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+      });
+
+      return response;
     }
 
     return NextResponse.json(
