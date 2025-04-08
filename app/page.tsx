@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -16,11 +16,10 @@ export default function Home() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Button className="gap-2">
+            <Link href='/note/add' className={`${buttonVariants({ variant: 'default' })} gap-2`}>
               <Plus className="h-4 w-4" />
               Add New Note
-            </Button>
+            </Link>
           </div>
         </div>
 
@@ -36,13 +35,12 @@ export default function Home() {
               </p>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Created: {new Date().toLocaleDateString()}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                <Link
+                  href='/note/view/1'
+                  className={`${buttonVariants({variant: "secondary", size: "sm"})} opacity-0 group-hover:opacity-100 transition-opacity`}
                 >
                   View
-                </Button>
+                </Link>
               </div>
             </div>
           </div>
