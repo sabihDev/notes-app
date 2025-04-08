@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
@@ -30,19 +31,14 @@ export default function Login() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                required
-              />
+              <PasswordInput id="password" placeholder="••••••••" required />
             </div>
           </div>
           <Button className="w-full" type="submit">
             Sign in
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            Don&apos; have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up
             </Link>
