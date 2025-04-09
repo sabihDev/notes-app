@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { AuthProvider } from "@/context/auth-context";
+import { ToastContainer } from "@/components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           >
             <Navbar />
             {children}
+            <ToastContainer />
           </ThemeProvider>
         </AuthProvider>
       </body>

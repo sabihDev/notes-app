@@ -4,14 +4,15 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "@/context/auth-context";
+import { showToast } from "@/components/ui/toast";
 
 export function Navbar() {
   const { user, logout, isLoading } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-    // Force a page reload after logout to ensure auth state is properly updated
     window.location.href = "/";
+    showToast("Logged out successfully", "success");
   };
 
   return (
@@ -24,7 +25,7 @@ export function Navbar() {
           {!isLoading && (
             <>
               {user ? (
-                <Button variant="ghost" onClick={handleLogout}>
+                <Button variant="default" onClick={handleLogout}>
                   Logout
                 </Button>
               ) : (

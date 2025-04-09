@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
-
+import { showToast } from "@/components/ui/toast";
 interface AuthFormProps {
   type: "login" | "signup";
 }
@@ -46,6 +46,7 @@ export function AuthForm({ type }: AuthFormProps) {
       router.push("/");
       router.refresh();
       window.location.href = "/";
+      showToast(`${type === "login" ? "Logged in" : "Signed up"} successfully`, "success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
