@@ -1,63 +1,56 @@
 # Notey - A Modern Notes Application
 
-Notey is a beautiful and intuitive notes application built with Next.js, featuring dark mode support and a clean, modern interface.
+Notey is a beautiful and intuitive notes application built with Next.js, featuring authentication, dark mode support and a clean, modern interface.
 
 ## Features
 
-- 📝 Create and manage notes
+- 🔒 Secure email/password authentication
 - 🌓 Dark/Light mode support
 - 🎨 Modern UI with Shadcn UI components
 - ⚡ Fast and responsive design
-- 🔒 Secure authentication
+- 🔔 Toast notifications
+- 📱 Mobile-friendly interface
 
 ## Tech Stack
+This project uses modern web technologies to deliver a seamless note-taking experience:
 
-- Next.js 14
+- **Frontend**: Built with Next.js and React for a fast, interactive UI
+- **Styling**: Tailwind CSS for responsive design and Shadcn UI for polished components
+- **Backend**: Prisma ORM with SQLite/PostgreSQL for data persistence
+- **Authentication**: Custom email/password auth with bcrypt for security
+- **TypeScript**: For type safety and better developer experience
+
+## Key Features Explained
+
+### Authentication
+- Secure login/signup system
+- Password hashing with bcrypt
+- Protected routes and API endpoints
+
+### Dark Mode
+- System-based automatic theme detection
+- Manual theme toggle option
+- Persisted theme preference
+
+### Toast Notifications
+- Clean notification system
+- Different styles for success/error/info
+- Auto-dismiss functionality
+
+### Responsive Design
+- Mobile-first approach
+- Fluid layouts that work on all devices
+- Optimized for touch interfaces
+
+- Next.js 15
+- React 19
 - TypeScript
 - Tailwind CSS
+- Prisma
 - Shadcn UI
-- Next Auth (coming soon)
+- bcrypt.js
 
 ## Getting Started
 
 1. Clone the repository:
 
-```bash
-git clone https://github.com/yourusername/notey.git
-cd notey
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Run the development server:
-
-```bash
-npm run dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
-
-```
-notey/
-├── app/              # Next.js app directory
-│   ├── login/        # Login page
-│   └── page.tsx      # Home page
-├── components/       # React components
-│   ├── ui/          # Shadcn UI components
-│   └── navbar.tsx   # Global navigation
-└── public/          # Static assets
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
