@@ -45,6 +45,7 @@ export function AuthForm({ type }: AuthFormProps) {
       // Redirect to home page on success
       router.push("/");
       router.refresh();
+      window.location.href = "/";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

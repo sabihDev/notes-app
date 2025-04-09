@@ -8,6 +8,12 @@ import { useAuth } from "@/context/auth-context";
 export function Navbar() {
   const { user, logout, isLoading } = useAuth();
 
+  const handleLogout = async () => {
+    await logout();
+    // Force a page reload after logout to ensure auth state is properly updated
+    window.location.href = "/";
+  };
+
   return (
     <nav className="border-b">
       <div className="flex h-16 items-center px-4">
@@ -18,16 +24,16 @@ export function Navbar() {
           {!isLoading && (
             <>
               {user ? (
-                <Button variant="ghost" onClick={logout}>
+                <Button variant="ghost" onClick={handleLogout}>
                   Logout
                 </Button>
               ) : (
                 <>
                   <Link href="/login">
-                    <Button variant="ghost">Login</Button>
+                    <Button variant="default">Login</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button>Sign Up</Button>
+                    <Button variant="outline">Sign Up</Button>
                   </Link>
                 </>
               )}
