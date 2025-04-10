@@ -86,7 +86,7 @@ export default function Home() {
                         Updated: {new Date(note.updatedAt).toLocaleDateString()}
                       </span>
                       <Link
-                        href={`/note/${note.id}`}
+                        href={`/note/view/${note.id}`}
                         className={`${buttonVariants({
                           variant: "secondary",
                           size: "sm",
