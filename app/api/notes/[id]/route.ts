@@ -18,7 +18,8 @@ export async function GET(
     const id = params.id;
 
     // Get user ID from cookie
-    const userId = cookies().get("userId")?.value;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
 
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -64,7 +65,8 @@ export async function PATCH(
     }
 
     // Get user ID from cookie
-    const userId = cookies().get("userId")?.value;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
 
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -109,7 +111,8 @@ export async function DELETE(
     const id = params.id;
 
     // Get user ID from cookie
-    const userId = cookies().get("userId")?.value;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
 
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

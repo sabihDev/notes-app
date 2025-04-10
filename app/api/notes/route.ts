@@ -13,7 +13,8 @@ const noteSchema = z.object({
 export async function GET() {
   try {
     // Get user ID from cookie
-    const userId = cookies().get("userId")?.value;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
 
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -54,7 +55,8 @@ export async function POST(request: Request) {
     }
 
     // Get user ID from cookie
-    const userId = cookies().get("userId")?.value;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get("userId")?.value;
 
     if (!userId) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
