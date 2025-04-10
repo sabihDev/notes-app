@@ -9,6 +9,7 @@ import { ArrowLeft, Edit, Trash } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
+import remarkGfm from "remark-gfm";
 
 // Define API note type
 interface ApiNote {
@@ -22,20 +23,93 @@ interface ApiNote {
 
 type Params = Promise<{ slug: string }>;
 
-// Helper function to decode HTML entities and escape sequences
-function decodeText(text: string): string {
-  // First decode any HTML entities
+// Simple decoder for titles - only decode entities without adding formatting
+function decodeTitle(text: string): string {
+  // Decode HTML entities
   const textarea = document.createElement("textarea");
   textarea.innerHTML = text;
   const decodedHtml = textarea.value;
 
-  // Then handle JavaScript escape sequences
+  // Handle JavaScript escape sequences
   return decodedHtml
     .replace(/\\n/g, "\n")
     .replace(/\\t/g, "\t")
     .replace(/\\"/g, '"')
     .replace(/\\'/g, "'")
     .replace(/\\\\/g, "\\");
+}
+
+// More complex decoder for content that also formats markdown
+function decodeText(text: string): string {
+  // First decode HTML entities
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+  const decodedHtml = textarea.value;
+
+  // Handle JavaScript escape sequences
+  const decoded = decodedHtml
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/\\"/g, '"')
+    .replace(/\\'/g, "'")
+    .replace(/\\\\/g, "\\");
+
+  // Split the text into lines
+  const lines = decoded.split("\n");
+  const formattedLines = [];
+
+  // Process each line to detect headings
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+
+    // Skip empty lines
+    if (!trimmedLine) {
+      formattedLines.push(line);
+      continue;
+    }
+
+    // Detect main title (first non-empty line that has some length)
+    if (formattedLines.length === 0 || formattedLines.every((l) => !l.trim())) {
+      if (trimmedLine.length > 15) {
+        formattedLines.push(`# ${trimmedLine}`);
+        continue;
+      }
+    }
+
+    // Detect section headers:
+    // 1. Line starts with capital letter
+    // 2. Line is relatively short (less than 60 chars)
+    // 3. Line doesn't end with common sentence endings
+    // 4. Previous line is empty or next line is empty
+    const isCapitalized = /^[A-Z]/.test(trimmedLine);
+    const isShort = trimmedLine.length < 60;
+    const hasNoEndingPunctuation = !trimmedLine.match(/[.,:;]$/);
+    const isPrecededByEmptyLine = i === 0 || !lines[i - 1].trim();
+    const isFollowedByEmptyLine =
+      i === lines.length - 1 || !lines[i + 1].trim();
+
+    // Additional checks for section headers
+    const hasColon = trimmedLine.includes(":");
+    const wordsCapitalized = trimmedLine
+      .split(" ")
+      .filter((w) => w.length > 3)
+      .every((w) => /^[A-Z]/.test(w));
+
+    // If it meets the criteria for a section header
+    if (
+      isCapitalized &&
+      isShort &&
+      (hasNoEndingPunctuation || hasColon) &&
+      (isPrecededByEmptyLine || isFollowedByEmptyLine || wordsCapitalized)
+    ) {
+      formattedLines.push(`## ${trimmedLine}`);
+    } else {
+      formattedLines.push(line);
+    }
+  }
+
+  return formattedLines.join("\n");
 }
 
 export default function ViewNote({ params }: { params: Params }) {
@@ -164,13 +238,14 @@ export default function ViewNote({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{decodeText(note.title)}</h1>
+        <h1 className="text-3xl font-bold">{decodeTitle(note.title)}</h1>
         <div className="text-sm text-muted-foreground">
           Last updated: {new Date(note.updatedAt).toLocaleString()}
         </div>
         <div className="mt-6">
           <ReactMarkdown
             rehypePlugins={[rehypeSanitize]}
+            remarkPlugins={[remarkGfm]}
             components={{
               // Apply className to the root div that contains markdown
               p: ({ children, ...props }) => (
