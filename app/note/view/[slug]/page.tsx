@@ -7,6 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft, Edit, Trash } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
+import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 
 // Define API note type
 interface ApiNote {
@@ -20,6 +22,22 @@ interface ApiNote {
 
 type Params = Promise<{ slug: string }>;
 
+// Helper function to decode HTML entities and escape sequences
+function decodeText(text: string): string {
+  // First decode any HTML entities
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+  const decodedHtml = textarea.value;
+
+  // Then handle JavaScript escape sequences
+  return decodedHtml
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/\\"/g, '"')
+    .replace(/\\'/g, "'")
+    .replace(/\\\\/g, "\\");
+}
+
 export default function ViewNote({ params }: { params: Params }) {
   const router = useRouter();
   const [note, setNote] = useState<ApiNote | null>(null);
@@ -30,8 +48,8 @@ export default function ViewNote({ params }: { params: Params }) {
   useEffect(() => {
     async function extractSlug() {
       try {
-        const data = await params;
-        setSlug(data.slug);
+        const resolvedParams = await params;
+        setSlug(resolvedParams.slug);
       } catch (error) {
         console.error("Error extracting slug:", error);
         router.push("/");
@@ -121,7 +139,7 @@ export default function ViewNote({ params }: { params: Params }) {
 
         <div className="flex gap-2">
           <Link
-            href={`/note/edit/${note.id}`}
+            href={`/note/update/${note.id}`}
             className={buttonVariants({
               variant: "outline",
               size: "sm",
@@ -146,11 +164,109 @@ export default function ViewNote({ params }: { params: Params }) {
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{note.title}</h1>
+        <h1 className="text-3xl font-bold">{decodeText(note.title)}</h1>
         <div className="text-sm text-muted-foreground">
           Last updated: {new Date(note.updatedAt).toLocaleString()}
         </div>
-        <div className="mt-6 whitespace-pre-wrap">{note.content}</div>
+        <div className="mt-6">
+          <ReactMarkdown
+            rehypePlugins={[rehypeSanitize]}
+            components={{
+              // Apply className to the root div that contains markdown
+              p: ({ children, ...props }) => (
+                <p className="my-4" {...props}>
+                  {children}
+                </p>
+              ),
+              h1: ({ children, ...props }) => (
+                <h1 className="text-2xl font-bold mt-6 mb-4" {...props}>
+                  {children}
+                </h1>
+              ),
+              h2: ({ children, ...props }) => (
+                <h2 className="text-xl font-bold mt-5 mb-3" {...props}>
+                  {children}
+                </h2>
+              ),
+              h3: ({ children, ...props }) => (
+                <h3 className="text-lg font-bold mt-4 mb-2" {...props}>
+                  {children}
+                </h3>
+              ),
+              ul: ({ children, ...props }) => (
+                <ul className="list-disc pl-6 my-4" {...props}>
+                  {children}
+                </ul>
+              ),
+              ol: ({ children, ...props }) => (
+                <ol className="list-decimal pl-6 my-4" {...props}>
+                  {children}
+                </ol>
+              ),
+              li: ({ children, ...props }) => (
+                <li className="my-1" {...props}>
+                  {children}
+                </li>
+              ),
+              blockquote: ({ children, ...props }) => (
+                <blockquote
+                  className="border-l-4 border-primary pl-4 italic my-4"
+                  {...props}
+                >
+                  {children}
+                </blockquote>
+              ),
+              pre: ({ children, ...props }) => (
+                <pre
+                  className="bg-muted p-4 rounded-md overflow-x-auto my-4"
+                  {...props}
+                >
+                  {children}
+                </pre>
+              ),
+              code: ({ className, children, ...props }) => (
+                <code
+                  className={`${className || ""} ${
+                    props.node?.position?.start?.line
+                      ? ""
+                      : "bg-muted px-1.5 py-0.5 rounded text-sm"
+                  }`}
+                  {...props}
+                >
+                  {children}
+                </code>
+              ),
+              a: ({ children, ...props }) => (
+                <a className="text-primary hover:underline" {...props}>
+                  {children}
+                </a>
+              ),
+              hr: ({ ...props }) => (
+                <hr className="my-6 border-t border-border" {...props} />
+              ),
+              table: ({ children, ...props }) => (
+                <table className="w-full border-collapse my-4" {...props}>
+                  {children}
+                </table>
+              ),
+              th: ({ children, ...props }) => (
+                <th
+                  className="border border-border p-2 bg-muted font-semibold"
+                  {...props}
+                >
+                  {children}
+                </th>
+              ),
+              td: ({ children, ...props }) => (
+                <td className="border border-border p-2" {...props}>
+                  {children}
+                </td>
+              ),
+            }}
+          >
+            {decodeText(note.content)}
+          </ReactMarkdown>
+        </div>
       </div>
     </div>
   );

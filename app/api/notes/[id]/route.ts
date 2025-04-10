@@ -12,10 +12,11 @@ const noteSchema = z.object({
 // Get a specific note
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     // Get user ID from cookie
     const cookieStore = await cookies();
@@ -48,10 +49,11 @@ export async function GET(
 // Update a note
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
     const body = await request.json();
 
     // Validate note data
@@ -105,10 +107,11 @@ export async function PATCH(
 // Delete a note
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
     // Get user ID from cookie
     const cookieStore = await cookies();
